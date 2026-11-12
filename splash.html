@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Guest Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: #1E1A4A;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .splash {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding-bottom: 100px;
+    }
+
+    /* ── ANIMATED BACKGROUND ── */
+    /* Subtle grid of dots */
+    .splash::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(
+        circle,
+        rgba(255,255,255,0.06) 1px,
+        transparent 1px
+      );
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    /* Diagonal stripe overlay */
+    .splash::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 24px,
+        rgba(255,255,255,0.015) 24px,
+        rgba(255,255,255,0.015) 48px
+      );
+      pointer-events: none;
+    }
+
+    /* Decorative glowing orbs */
+    .orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(60px);
+      pointer-events: none;
+      animation: orbFloat 8s ease-in-out infinite alternate;
+    }
+
+    .orb-1 {
+      width: 260px; height: 260px;
+      top: -80px; left: -80px;
+      background: rgba(83, 74, 183, 0.35);
+      animation-delay: 0s;
+    }
+
+    .orb-2 {
+      width: 200px; height: 200px;
+      bottom: -60px; right: -60px;
+      background: rgba(29, 158, 117, 0.25);
+      animation-delay: -3s;
+    }
+
+    .orb-3 {
+      width: 140px; height: 140px;
+      top: 40%; right: 15%;
+      background: rgba(127, 119, 221, 0.2);
+      animation-delay: -5s;
+    }
+
+    @keyframes orbFloat {
+      from { transform: translate(0, 0) scale(1); }
+      to   { transform: translate(12px, -16px) scale(1.06); }
+    }
+
+    /* Decorative rings */
+    .ring {
+      position: absolute;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.05);
+      pointer-events: none;
+      animation: ringPulse 6s ease-in-out infinite;
+    }
+
+    .ring:nth-child(2) { animation-delay: -2s; }
+    .ring:nth-child(3) { animation-delay: -4s; }
+
+    @keyframes ringPulse {
+      0%, 100% { opacity: 0.4; }
+      50%       { opacity: 0.1; }
+    }
+
+    /* ── CONTENT ── */
+    .content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    /* Icon box */
+    .icon-wrap {
+      width: 110px;
+      height: 110px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 28px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 32px;
+      opacity: 0;
+      transform: scale(0.7) translateY(12px);
+      animation: iconIn 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) 0.1s forwards;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Shimmer on icon box */
+    .icon-wrap::after {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      animation: iconShimmer 3s ease-in-out 0.7s infinite;
+    }
+
+    @keyframes iconShimmer {
+      0%   { left: -100%; }
+      100% { left: 140%; }
+    }
+
+    @keyframes iconIn {
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    /* Title */
+    .splash-title {
+      color: #ffffff;
+      font-size: 32px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+      opacity: 0;
+      transform: translateY(10px);
+      animation: fadeUp 0.45s ease 0.4s forwards;
+    }
+
+    /* Subtitle */
+    .splash-subtitle {
+      color: rgba(255,255,255,0.4);
+      font-size: 13px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.4px;
+      margin-bottom: 52px;
+      opacity: 0;
+      transform: translateY(8px);
+      animation: fadeUp 0.45s ease 0.55s forwards;
+    }
+
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Progress bar */
+    .progress-wrap {
+      width: 280px;
+      opacity: 0;
+      animation: fadeUp 0.4s ease 0.65s forwards;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255,255,255,0.08);
+      border-radius: 99px;
+      overflow: hidden;
+      margin-bottom: 12px;
+      position: relative;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      border-radius: 99px;
+      background: linear-gradient(90deg, #5DCAA5, #7F77DD);
+      transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+
+    /* Shimmer on progress bar */
+    .progress-bar::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      width: 50%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.35), transparent);
+      animation: progressShimmer 1.4s ease-in-out infinite;
+    }
+
+    @keyframes progressShimmer {
+      0%   { transform: translateX(-100%); }
+      100% { transform: translateX(200%); }
+    }
+
+    .progress-label {
+      text-align: center;
+      color: rgba(255,255,255,0.28);
+      font-size: 11px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.5px;
+      min-height: 16px;
+      transition: opacity 0.25s;
+    }
+
+    /* Step dots */
+    .step-dots {
+      display: flex;
+      gap: 6px;
+      justify-content: center;
+      margin-top: 14px;
+      opacity: 0;
+      animation: fadeUp 0.4s ease 0.8s forwards;
+    }
+
+    .step-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: rgba(255,255,255,0.15);
+      transition: background 0.3s, transform 0.3s;
+    }
+
+    .step-dot.done {
+      background: var(--teal, #5DCAA5);
+      transform: scale(1.2);
+    }
+
+    /* Credit block at bottom */
+    .credit {
+      position: absolute;
+      bottom: 18px;
+      left: 0;
+      right: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      opacity: 0;
+      animation: fadeUp 0.4s ease 1s forwards;
+      z-index: 1;
+    }
+
+    .credit-divider {
+      width: 40px;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+      margin-bottom: 8px;
+    }
+
+    .credit-label {
+      color: rgba(255,255,255,0.22);
+      font-size: 10px;
+      font-family: 'DM Mono', monospace;
+      letter-spacing: 0.6px;
+      text-transform: uppercase;
+    }
+
+    .credit-name {
+      color: rgba(255,255,255,0.55);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.1px;
+    }
+
+    .credit-version {
+      color: rgba(255,255,255,0.18);
+      font-size: 10px;
+      font-family: 'DM Mono', monospace;
+      margin-top: 1px;
+    }
+  </style>
+</head>
+<body>
+  <div class="splash">
+
+    <!-- Glowing orbs -->
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+
+    <!-- Background rings -->
+    <div class="ring" style="width:460px;height:460px;top:-160px;left:-140px;"></div>
+    <div class="ring" style="width:300px;height:300px;top:-60px;left:-20px;"></div>
+    <div class="ring" style="width:360px;height:360px;bottom:-130px;right:-100px;"></div>
+
+    <!-- Main content -->
+    <div class="content">
+      <div class="icon-wrap">
+        <svg width="56" height="56" viewBox="0 0 44 44" fill="none">
+          <rect x="2" y="6" width="40" height="30" rx="5" stroke="white" stroke-width="2.2"/>
+          <circle cx="16" cy="18" r="5.5" stroke="white" stroke-width="2.2"/>
+          <path d="M4.5 34.5c1.2-7 6.5-10 11.5-10s10.3 3 11.5 10" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+          <path d="M31 15h9M31 21h9" stroke="white" stroke-width="2.2" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="splash-title">Guest Management</div>
+      <div class="splash-subtitle">Initializing application · v2.0</div>
+
+      <div class="progress-wrap">
+        <div class="progress-track">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-label" id="progressLabel">Starting up...</div>
+      </div>
+
+      <!-- Step dots -->
+      <div class="step-dots" id="stepDots">
+        <div class="step-dot" id="dot0"></div>
+        <div class="step-dot" id="dot1"></div>
+        <div class="step-dot" id="dot2"></div>
+        <div class="step-dot" id="dot3"></div>
+        <div class="step-dot" id="dot4"></div>
+      </div>
+    </div>
+
+    <div class="credit">
+      <div class="credit-divider"></div>
+      <span class="credit-label">Developed by</span>
+      <span class="credit-name">Jhon Kyle B. Araneta</span>
+      <span class="credit-version">v2.0.0</span>
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+
+    const bar   = document.getElementById('progressBar');
+    const label = document.getElementById('progressLabel');
+
+    const steps = [
+      { pct: 18,  msg: 'Loading application...' },
+      { pct: 42,  msg: 'Connecting to database...' },
+      { pct: 68,  msg: 'Fetching guest records...' },
+      { pct: 88,  msg: 'Preparing interface...' },
+      { pct: 100, msg: 'Ready!' },
+    ];
+
+    let i = 0;
+
+    function nextStep() {
+      if (i >= steps.length) return;
+      const step = steps[i];
+
+      bar.style.width   = step.pct + '%';
+      label.style.opacity = '0';
+
+      setTimeout(() => {
+        label.textContent   = step.msg;
+        label.style.opacity = '1';
+      }, 120);
+
+      // Mark the step dot as done
+      const dot = document.getElementById(`dot${i}`);
+      if (dot) dot.classList.add('done');
+
+      i++;
+
+      if (i < steps.length) {
+        // Slightly variable timing so it feels organic
+        const delays = [520, 490, 510, 480];
+        setTimeout(nextStep, delays[i - 1] || 500);
+      } else {
+        setTimeout(() => {
+          ipcRenderer.send('splash-done');
+        }, 650);
+      }
+    }
+
+    setTimeout(nextStep, 850);
+  </script>
+</body>
+</html>

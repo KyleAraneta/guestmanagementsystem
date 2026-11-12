@@ -1,0 +1,1216 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Guest Management System</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --purple-900: #1E1A4A;
+      --purple-800: #2D2870;
+      --purple-700: #3C3489;
+      --purple-600: #534AB7;
+      --purple-400: #7F77DD;
+      --purple-100: #CECBF6;
+      --purple-50:  #EEEDFE;
+
+      --teal-700: #0F6E56;
+      --teal-600: #1D9E75;
+      --teal-500: #5DCAA5;
+      --teal-100: #9FE1CB;
+      --teal-50:  #E1F5EE;
+
+      --red-700:  #A32D2D;
+      --red-600:  #C0392B;
+      --red-400:  #E24B4A;
+      --red-100:  #F7C1C1;
+      --red-50:   #FCEBEB;
+
+      --amber-600: #BA7517;
+      --amber-400: #EF9F27;
+      --amber-50:  #FAEEDA;
+
+      --blue-700: #185FA5;
+      --blue-500: #378ADD;
+      --blue-50:  #E6F1FB;
+
+      --gray-900: #1A1A1A;
+      --gray-700: #3A3A3A;
+      --gray-500: #6B6B6B;
+      --gray-400: #9A9A9A;
+      --gray-200: #E4E4E4;
+      --gray-100: #F0F0F0;
+      --gray-50:  #F7F7F7;
+
+      --bg: #F2F1F8;
+      --surface: #FFFFFF;
+      --border: rgba(0,0,0,0.07);
+      --border-strong: rgba(0,0,0,0.13);
+
+      --font: 'DM Sans', sans-serif;
+      --mono: 'DM Mono', monospace;
+      --radius-sm: 8px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--gray-900);
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    /* ── PAGE ENTRY ── */
+    @keyframes pageFadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page { animation: pageFadeIn 0.4s ease both; }
+
+    /* ── TOPBAR ── */
+    .topbar {
+      background: linear-gradient(135deg, var(--purple-900) 0%, var(--purple-800) 60%, #352C8A 100%);
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 16px rgba(30, 26, 74, 0.35);
+      overflow: hidden;
+    }
+
+    /* subtle diagonal stripe texture */
+    .topbar::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent,
+        transparent 20px,
+        rgba(255,255,255,0.018) 20px,
+        rgba(255,255,255,0.018) 40px
+      );
+      pointer-events: none;
+    }
+
+    .topbar-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .topbar-icon {
+      width: 32px;
+      height: 32px;
+      background: rgba(255, 255, 255, 0.13);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .topbar h1 {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      letter-spacing: -0.2px;
+    }
+
+    .version-chip {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.15);
+      color: rgba(255,255,255,0.55);
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+      font-family: var(--mono);
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      position: relative;
+    }
+
+    .live-badge {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(29, 158, 117, 0.25);
+      border: 1px solid rgba(93, 202, 165, 0.35);
+      color: var(--teal-500);
+      font-size: 11px;
+      font-weight: 600;
+      padding: 4px 11px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    .live-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--teal-500);
+      border-radius: 50%;
+      animation: pulse 1.8s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    .topbar-date {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 12px;
+      font-family: var(--mono);
+    }
+
+    /* ── MAIN LAYOUT ── */
+    .page {
+      padding: 20px 20px 32px;
+      max-width: 1120px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── METRIC CARDS ── */
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+    }
+
+    .metric-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px 14px;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      cursor: default;
+      /* staggered entrance */
+      opacity: 0;
+      animation: metricIn 0.45s ease forwards;
+    }
+
+    .metric-card:nth-child(1) { animation-delay: 0.05s; }
+    .metric-card:nth-child(2) { animation-delay: 0.12s; }
+    .metric-card:nth-child(3) { animation-delay: 0.19s; }
+    .metric-card:nth-child(4) { animation-delay: 0.26s; }
+
+    @keyframes metricIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .metric-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 28px rgba(0, 0, 0, 0.1);
+    }
+
+    .metric-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0;
+      height: 3px;
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    }
+
+    /* Animated pulse ring accent */
+    .metric-ring {
+      position: absolute;
+      bottom: -18px; right: -18px;
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      opacity: 0;
+      animation: ringExpand 2.5s ease-out infinite;
+    }
+
+    @keyframes ringExpand {
+      0%   { opacity: 0.14; transform: scale(0.55); }
+      100% { opacity: 0;    transform: scale(1.5); }
+    }
+
+    .metric-card.mc-purple::before { background: linear-gradient(90deg, var(--purple-700), var(--purple-400)); }
+    .metric-card.mc-purple .metric-ring { background: var(--purple-600); animation-delay: 0s; }
+    .metric-card.mc-teal::before   { background: linear-gradient(90deg, var(--teal-600), var(--teal-500)); }
+    .metric-card.mc-teal .metric-ring   { background: var(--teal-600);   animation-delay: 0.6s; }
+    .metric-card.mc-red::before    { background: linear-gradient(90deg, var(--red-600), var(--red-400)); }
+    .metric-card.mc-red .metric-ring    { background: var(--red-600);    animation-delay: 1.2s; }
+    .metric-card.mc-amber::before  { background: linear-gradient(90deg, var(--amber-600), var(--amber-400)); }
+    .metric-card.mc-amber .metric-ring  { background: var(--amber-600);  animation-delay: 1.8s; }
+
+    .metric-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: 30px;
+      font-weight: 600;
+      line-height: 1;
+      margin-bottom: 6px;
+      letter-spacing: -1.5px;
+      transition: transform 0.3s, color 0.3s;
+    }
+
+    .metric-value.pop {
+      animation: numPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes numPop {
+      0%   { transform: scale(1); }
+      50%  { transform: scale(1.18); }
+      100% { transform: scale(1); }
+    }
+
+    .metric-card.mc-purple .metric-value { color: var(--purple-700); }
+    .metric-card.mc-teal   .metric-value { color: var(--teal-600); }
+    .metric-card.mc-red    .metric-value { color: var(--red-600); }
+    .metric-card.mc-amber  .metric-value { color: var(--amber-600); }
+
+    .metric-sub {
+      font-size: 11px;
+      color: var(--gray-400);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .metric-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ── HOURLY CHART ── */
+    .chart-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px 14px;
+      opacity: 0;
+      animation: metricIn 0.45s ease 0.3s forwards;
+    }
+
+    .chart-card:hover {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+    }
+
+    .chart-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+
+    .chart-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11px;
+      color: var(--gray-500);
+    }
+
+    .legend-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+    }
+
+    .chart-bars {
+      display: flex;
+      align-items: flex-end;
+      gap: 5px;
+      height: 60px;
+      position: relative;
+      padding-bottom: 18px;
+    }
+
+    .bar-col {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      height: 100%;
+      justify-content: flex-end;
+    }
+
+    .bar-wrap {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      flex: 1;
+    }
+
+    .bar {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+      min-height: 2px;
+      transform-origin: bottom;
+      animation: barGrow 0.55s cubic-bezier(0.34, 1.3, 0.64, 1) both;
+    }
+
+    @keyframes barGrow {
+      from { transform: scaleY(0); opacity: 0; }
+      to   { transform: scaleY(1); opacity: 1; }
+    }
+
+    .bar-hour {
+      font-size: 9px;
+      color: var(--gray-400);
+      font-family: var(--mono);
+      white-space: nowrap;
+      position: absolute;
+      bottom: 0;
+    }
+
+    /* ── TWO COLUMN ── */
+    .two-col {
+      display: grid;
+      grid-template-columns: 380px 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .left-col {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    /* ── CARD ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .card:hover {
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07);
+      transform: translateY(-1px);
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    .card-icon {
+      width: 26px;
+      height: 26px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .ci-purple { background: var(--purple-50); }
+    .ci-teal   { background: var(--teal-50); }
+    .ci-blue   { background: var(--blue-50); }
+
+    .count-pill {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 3px 10px;
+      border-radius: 20px;
+    }
+
+    .cp-teal   { background: var(--teal-50);   color: var(--teal-700); }
+    .cp-purple { background: var(--purple-50); color: var(--purple-700); }
+
+    /* ── FORM ── */
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .form-label {
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input {
+      background: var(--gray-50);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 9px 12px;
+      font-size: 13px;
+      color: var(--gray-900);
+      outline: none;
+      font-family: var(--font);
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+      width: 100%;
+    }
+
+    .form-input::placeholder { color: var(--gray-400); }
+
+    .form-input:focus {
+      border-color: var(--purple-400);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(127, 119, 221, 0.14);
+    }
+
+    /* ── SHIMMER BUTTON ── */
+    .btn-timein {
+      background: linear-gradient(135deg, var(--purple-700), var(--purple-600));
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 10px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 8px;
+      font-family: var(--font);
+      letter-spacing: 0.1px;
+      transition: opacity 0.15s, transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 2px 8px rgba(83, 74, 183, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* shimmer sweep */
+    .btn-timein::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -80%;
+      width: 60%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.22),
+        transparent
+      );
+      animation: shimmerSweep 2.4s ease-in-out infinite;
+    }
+
+    @keyframes shimmerSweep {
+      0%   { left: -80%; }
+      100% { left: 130%; }
+    }
+
+    .btn-timein:hover:not(:disabled) {
+      opacity: 0.9;
+      box-shadow: 0 5px 16px rgba(83, 74, 183, 0.42);
+    }
+
+    .btn-timein:hover:not(:disabled)::after {
+      animation-duration: 1.2s;
+    }
+
+    .btn-timein:active:not(:disabled) { transform: scale(0.985); }
+
+    .btn-timein:disabled {
+      opacity: 0.42;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .btn-timein:disabled::after { display: none; }
+
+    /* ── GUESTS INSIDE TABLE ── */
+    .guests-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    .guests-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .guests-table td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      color: var(--gray-900);
+      font-size: 13px;
+      vertical-align: middle;
+    }
+
+    .guests-table tbody tr:last-child td { border-bottom: none; }
+
+    .guests-table tbody tr {
+      transition: background 0.15s;
+    }
+
+    .guests-table tbody tr:hover {
+      background: var(--gray-50);
+    }
+
+    .guests-table tbody tr:hover .avatar {
+      transform: scale(1.12);
+    }
+
+    .guest-name-cell {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .avatar {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+      text-transform: uppercase;
+      transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    .av-0 { background: var(--purple-50); color: var(--purple-700); }
+    .av-1 { background: var(--teal-50);   color: var(--teal-700); }
+    .av-2 { background: var(--blue-50);   color: var(--blue-700); }
+    .av-3 { background: var(--amber-50);  color: var(--amber-600); }
+
+    .visit-text { color: var(--gray-500); font-size: 12px; }
+    .time-text  { color: var(--gray-400); font-size: 11px; font-family: var(--mono); }
+
+    .btn-timeout {
+      background: var(--red-50);
+      color: var(--red-700);
+      border: 1px solid var(--red-100);
+      border-radius: var(--radius-sm);
+      padding: 4px 11px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background 0.15s, transform 0.12s, box-shadow 0.12s;
+    }
+
+    .btn-timeout:hover {
+      background: var(--red-100);
+      transform: scale(1.05);
+      box-shadow: 0 2px 8px rgba(163, 45, 45, 0.15);
+    }
+
+    .btn-timeout:active { transform: scale(0.97); }
+
+    /* ── ROW ENTRY ANIMATION (staggered) ── */
+    @keyframes rowSlideIn {
+      from { opacity: 0; transform: translateX(-12px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    .row-new {
+      animation: rowSlideIn 0.32s ease both;
+    }
+
+    /* stagger is applied inline via style attribute in renderer.js */
+
+    /* ── LOG CARD ── */
+    .log-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      transition: box-shadow 0.2s, transform 0.2s;
+    }
+
+    .log-card:hover {
+      box-shadow: 0 6px 24px rgba(0, 0, 0, 0.07);
+      transform: translateY(-1px);
+    }
+
+    .search-wrap {
+      position: relative;
+      margin-bottom: 12px;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      pointer-events: none;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--gray-50);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 9px 11px 9px 33px;
+      font-size: 13px;
+      color: var(--gray-900);
+      outline: none;
+      font-family: var(--font);
+      transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    }
+
+    .search-input::placeholder { color: var(--gray-400); }
+
+    .search-input:focus {
+      border-color: var(--purple-400);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(127, 119, 221, 0.14);
+    }
+
+    /* ── TAB FILTER BAR ── */
+    .tab-filter {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 14px;
+    }
+
+    .tab-btn {
+      background: var(--gray-100);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 5px 13px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      font-family: var(--font);
+      color: var(--gray-500);
+      transition: all 0.15s;
+    }
+
+    .tab-btn.active {
+      background: var(--purple-50);
+      border-color: var(--purple-100);
+      color: var(--purple-700);
+    }
+
+    .tab-btn:hover:not(.active) {
+      background: var(--gray-200);
+    }
+
+    .log-table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+    }
+
+    .log-table th {
+      text-align: left;
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gray-400);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding: 0 8px 10px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .log-table td {
+      padding: 9px 8px;
+      border-bottom: 1px solid var(--border);
+      font-size: 12px;
+      color: var(--gray-900);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      vertical-align: middle;
+    }
+
+    .log-table tbody tr:last-child td { border-bottom: none; }
+
+    .log-table tbody tr {
+      transition: background 0.1s;
+    }
+
+    .log-table tbody tr:hover { background: var(--gray-50); }
+
+    .status-pill {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 20px;
+      letter-spacing: 0.3px;
+    }
+
+    .sp-out    { background: var(--red-50);  color: var(--red-700); }
+    .sp-inside { background: var(--teal-50); color: var(--teal-700); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      text-align: center;
+      padding: 32px 0;
+      color: var(--gray-400);
+      font-size: 13px;
+    }
+
+    .empty-state svg {
+      display: block;
+      margin: 0 auto 8px;
+      opacity: 0.35;
+    }
+
+    /* ── TOAST ── */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      padding: 12px 18px;
+      border-radius: var(--radius-md);
+      background: var(--gray-900);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(14px) scale(0.96);
+      transition: opacity 0.22s, transform 0.22s cubic-bezier(0.34, 1.4, 0.64, 1);
+      pointer-events: none;
+      z-index: 9999;
+      max-width: 300px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .toast::before {
+      content: '';
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--teal-500);
+      flex-shrink: 0;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0) scale(1); }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 12, 46, 0.45);
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9998;
+      animation: overlayIn 0.2s ease;
+    }
+
+    @keyframes overlayIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    .modal {
+      width: 360px;
+      max-width: calc(100% - 40px);
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      box-shadow: 0 24px 56px rgba(0, 0, 0, 0.18);
+      padding: 26px;
+      animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.88) translateY(10px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-icon {
+      width: 46px;
+      height: 46px;
+      border-radius: 13px;
+      background: var(--red-50);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 14px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gray-900);
+      margin-bottom: 6px;
+    }
+
+    .modal-text {
+      font-size: 13px;
+      color: var(--gray-500);
+      margin-bottom: 22px;
+      line-height: 1.5;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+      border: 1px solid var(--border-strong);
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: background 0.15s, transform 0.1s;
+    }
+
+    .btn-secondary:hover { background: var(--gray-200); }
+    .btn-secondary:active { transform: scale(0.97); }
+
+    .btn-danger {
+      background: linear-gradient(135deg, #C0392B, #E24B4A);
+      color: #fff;
+      border: none;
+      border-radius: var(--radius-sm);
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: var(--font);
+      transition: opacity 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+
+    .btn-danger:hover {
+      opacity: 0.9;
+      box-shadow: 0 4px 12px rgba(163, 45, 45, 0.4);
+    }
+
+    .btn-danger:active { transform: scale(0.97); }
+
+    .hidden { display: none !important; }
+  </style>
+</head>
+<body>
+
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="topbar-left">
+      <div class="topbar-icon">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <rect x="1" y="2" width="14" height="11" rx="2" stroke="white" stroke-width="1.3"/>
+          <circle cx="6" cy="6.5" r="1.8" stroke="white" stroke-width="1.3"/>
+          <path d="M2.5 12c.5-2 2-3 3.5-3s3 1 3.5 3" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+          <path d="M11 6h2.5M11 9h2.5" stroke="white" stroke-width="1.3" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <h1>Guest Management System</h1>
+      <span class="version-chip">v2.0</span>
+    </div>
+    <div class="topbar-right">
+      <div class="live-badge">
+        <div class="live-dot"></div>
+        Live
+      </div>
+      <span class="topbar-date" id="topbarDate"></span>
+    </div>
+  </div>
+
+  <div class="page">
+
+    <!-- METRICS -->
+    <div class="metrics">
+      <div class="metric-card mc-purple">
+        <div class="metric-ring"></div>
+        <div class="metric-label">Total guests today</div>
+        <div class="metric-value" id="totalToday">0</div>
+        <div class="metric-sub">
+          <div class="metric-dot" style="background:var(--purple-400)"></div>
+          All visits recorded
+        </div>
+      </div>
+      <div class="metric-card mc-teal">
+        <div class="metric-ring"></div>
+        <div class="metric-label">Currently inside</div>
+        <div class="metric-value" id="totalInside">0</div>
+        <div class="metric-sub">
+          <div class="metric-dot" style="background:var(--teal-600)"></div>
+          Active visits
+        </div>
+      </div>
+      <div class="metric-card mc-red">
+        <div class="metric-ring"></div>
+        <div class="metric-label">Checked out</div>
+        <div class="metric-value" id="totalOut">0</div>
+        <div class="metric-sub">
+          <div class="metric-dot" style="background:var(--red-600)"></div>
+          Completed visits
+        </div>
+      </div>
+      <div class="metric-card mc-amber">
+        <div class="metric-ring"></div>
+        <div class="metric-label">Avg. visit duration</div>
+        <div class="metric-value" id="avgDuration">—</div>
+        <div class="metric-sub">
+          <div class="metric-dot" style="background:var(--amber-600)"></div>
+          Today's average
+        </div>
+      </div>
+    </div>
+
+    <!-- HOURLY CHART -->
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title">
+          <div class="card-icon ci-purple">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <rect x="1" y="7" width="2.5" height="5" rx="1" fill="#534AB7"/>
+              <rect x="5" y="4" width="2.5" height="8" rx="1" fill="#534AB7"/>
+              <rect x="9" y="1.5" width="2.5" height="10.5" rx="1" fill="#534AB7" opacity=".4"/>
+              <rect x="11.5" y="5" width="1" height="7" rx=".5" fill="none"/>
+            </svg>
+          </div>
+          Visits by hour — today
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--purple-600)"></div>
+            Guests in
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--gray-200)"></div>
+            No activity
+          </div>
+        </div>
+      </div>
+      <div class="chart-bars" id="hourlyChart">
+        <!-- Rendered by renderer.js -->
+      </div>
+    </div>
+
+    <!-- TWO COLUMN -->
+    <div class="two-col">
+
+      <!-- LEFT -->
+      <div class="left-col">
+
+        <!-- GUEST ENTRY -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <div class="card-icon ci-purple">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="7" cy="4.5" r="2.5" stroke="#534AB7" stroke-width="1.3"/>
+                  <path d="M1.5 12.5c0-3 2.5-4.5 5.5-4.5s5.5 1.5 5.5 4.5" stroke="#534AB7" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </div>
+              New guest entry
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Full name</label>
+              <input class="form-input" type="text" id="fullName" placeholder="e.g. Juan Dela Cruz">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Person to visit</label>
+              <input class="form-input" type="text" id="personToVisit" placeholder="e.g. Engr. Santos">
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Purpose</label>
+              <input class="form-input" type="text" id="purpose" placeholder="e.g. Document submission">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact number</label>
+              <input class="form-input" type="text" id="contactNumber" placeholder="09XX XXX XXXX">
+            </div>
+          </div>
+          <button class="btn-timein" id="timeInBtn" disabled>✦ &nbsp;Time In Guest</button>
+        </div>
+
+        <!-- GUESTS INSIDE -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <div class="card-icon ci-teal">
+                <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                  <circle cx="7" cy="7" r="5.5" stroke="#1D9E75" stroke-width="1.3"/>
+                  <path d="M7 4v3.5l2 1.5" stroke="#1D9E75" stroke-width="1.3" stroke-linecap="round"/>
+                </svg>
+              </div>
+              Guests inside
+            </div>
+            <span class="count-pill cp-teal" id="insideCount">0 active</span>
+          </div>
+          <table class="guests-table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Visiting</th>
+                <th>Time in</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="guestTable"></tbody>
+          </table>
+          <div id="guestTableEmpty" class="empty-state hidden">
+            <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+              <circle cx="16" cy="11" r="5" stroke="#9A9A9A" stroke-width="1.5"/>
+              <path d="M6 28c0-5.5 4.5-9 10-9s10 3.5 10 9" stroke="#9A9A9A" stroke-width="1.5" stroke-linecap="round"/>
+            </svg>
+            No guests currently inside
+          </div>
+        </div>
+
+      </div><!-- /left-col -->
+
+      <!-- RIGHT: LOG -->
+      <div class="log-card">
+        <div class="card-header">
+          <div class="card-title">
+            <div class="card-icon ci-blue">
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+                <rect x="1.5" y="2" width="11" height="10" rx="2" stroke="#185FA5" stroke-width="1.3"/>
+                <path d="M4 5.5h6M4 8h4" stroke="#185FA5" stroke-width="1.3" stroke-linecap="round"/>
+              </svg>
+            </div>
+            Guest log
+          </div>
+        </div>
+
+        <div class="search-wrap">
+          <span class="search-icon">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
+              <circle cx="6" cy="6" r="4.5" stroke="#9A9A9A" stroke-width="1.3"/>
+              <path d="M9.5 9.5L12 12" stroke="#9A9A9A" stroke-width="1.3" stroke-linecap="round"/>
+            </svg>
+          </span>
+          <input class="search-input" type="text" id="searchInput" placeholder="Search by name or purpose...">
+        </div>
+
+        <!-- TAB FILTER -->
+        <div class="tab-filter">
+          <button class="tab-btn active" data-filter="all">All</button>
+          <button class="tab-btn" data-filter="Inside">Inside</button>
+          <button class="tab-btn" data-filter="Out">Checked out</button>
+        </div>
+
+        <table class="log-table">
+          <thead>
+            <tr>
+              <th style="width:20%">Name</th>
+              <th style="width:26%">Purpose</th>
+              <th style="width:18%">Time in</th>
+              <th style="width:18%">Time out</th>
+              <th style="width:9%">Duration</th>
+              <th style="width:9%">Status</th>
+            </tr>
+          </thead>
+          <tbody id="guestLogTable"></tbody>
+        </table>
+        <div id="guestLogEmpty" class="empty-state hidden">
+          <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+            <rect x="5" y="4" width="22" height="24" rx="3" stroke="#9A9A9A" stroke-width="1.5"/>
+            <path d="M10 11h12M10 16h8M10 21h6" stroke="#9A9A9A" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          No records found
+        </div>
+      </div>
+
+    </div><!-- /two-col -->
+  </div><!-- /page -->
+
+  <!-- TOAST -->
+  <div id="toast" class="toast"></div>
+
+  <!-- MODAL -->
+  <div id="modalOverlay" class="modal-overlay hidden">
+    <div class="modal">
+      <div class="modal-icon">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 6v5M10 14h.01" stroke="#A32D2D" stroke-width="1.8" stroke-linecap="round"/>
+          <circle cx="10" cy="10" r="8.5" stroke="#A32D2D" stroke-width="1.5"/>
+        </svg>
+      </div>
+      <h3 class="modal-title">Confirm time out</h3>
+      <p id="modalText" class="modal-text">Are you sure this guest is leaving?</p>
+      <div class="modal-actions">
+        <button id="cancelBtn" class="btn-secondary">Cancel</button>
+        <button id="confirmBtn" class="btn-danger">Yes, time out</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
