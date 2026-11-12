@@ -1,4 +1,4 @@
-Guest Management System
+🏨 Guest Management System
 
 A desktop-based Guest Management System designed to simplify guest registration, information management, and record organization.
 
@@ -28,52 +28,68 @@ Runtime Environment: Node.js
 Database: SQLite
 Code Editor: Visual Studio Code
 Version Control: Git and GitHub
-📸 System Screenshots
+
+## 📸 System Screenshots
 
 Below are screenshots showcasing the Guest Management System interface and its functionalities.
 
-Application Interface
+### 1. Application Interface
+![Application Interface](assets/screenshots/aa.png)
 
-!Screenshot 1
+### 2. Guest Management Interface
+![Guest Management Interface](assets/screenshots/as.png)
 
-Guest Management Interface
+### 3. System Features
+![System Features](assets/screenshots/assas.png)
 
-!Screenshot 2
+### 4. Guest Records
+![Guest Records](assets/screenshots/b.png)
 
-System Features
+### 5. Application Dashboard
+![Application Dashboard](assets/screenshots/image.png)
 
-!Screenshot 3
+### 6. System Interface
+![System Interface](assets/screenshots/sa.png)
 
-Guest Records
+### 7. Additional System View
+![Additional System View](assets/screenshots/ss.png)
 
-!Screenshot 4
-
-Application Dashboard
-
-!Screenshot 5
-
-System Interface
-
-!Screenshot 6
-
-Additional System View
-
-!Screenshot 7
 
 💻 Installation
-Clone this repository:
+
+Follow these steps to run the project on your local computer.
+
+Prerequisites
+Node.js installed
+npm (Node Package Manager)
+Git
+Installation Steps
+
+1. Clone the repository
+
 bash
 git clone https://github.com/KyleAraneta/guestmanagementsystem.git
 
-Navigate to the project directory:
+
+2. Navigate to the project directory
+
 bash
 cd guestmanagementsystem
 
-Install the project dependencies:
+
+3. Install the project dependencies
+
 bash
 npm install
 
-Start the application using the start script defined in package.json.
+
+4. Start the application
+
+Run the start script defined in your package.json.
+
+bash
+npm start
+
 👨‍💻 Project Developer
 
 Kyle Araneta
@@ -83,3 +99,5 @@ GitHub: @KyleAraneta
 📌 Project Information
 
 This project was developed as a Guest Management System application to improve the organization, accessibility, and management of guest information.
+
+⭐ If you find this project interesting, feel free to explore the repository!
